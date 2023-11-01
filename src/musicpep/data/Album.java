@@ -7,6 +7,15 @@ public class Album {
 	private String genre;
 	private int track_count;
 
+	public Album(int id, String album_name, String artist, String genre, int track_count) {
+		super();
+		this.id = id;
+		this.album_name = album_name;
+		this.artist = artist;
+		this.genre = genre;
+		this.track_count = track_count;
+	}
+
 	public int getId() {
 		return id;
 	}
