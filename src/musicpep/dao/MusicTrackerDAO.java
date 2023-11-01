@@ -39,5 +39,7 @@ public interface MusicTrackerDAO {
     public boolean deleteAlbumTracker(int trackerId, int albumId);
 
     public Trackers getTrackerID(int userId);
+    
+    public Album getAlbumByID(int albumID);
 
 }

@@ -7,6 +7,8 @@ import java.util.Scanner;
 import musicpep.data.User;
 import musicpep.dao.MusicTrackerDAO;
 import musicpep.dao.MusicTrackerDAOImpl;
+import musicpep.dao.NegativeTrackCountException;
+import musicpep.dao.TrackCountExceededException;
 import musicpep.data.User;
 
 public class login {
@@ -16,25 +18,32 @@ public class login {
 		
 	//*****************ConnectionMenu ********************************************
 		MusicTrackerDAO musicdao = new MusicTrackerDAOImpl();
-		musicdao.establishConnection();
+		try {
+			musicdao.establishConnection();
+		} catch (ClassNotFoundException | SQLException e) {
+			System.out.println("Connection could not be established.");
+			e.printStackTrace();
+			return;
+		}
 		
 	//*****************First Menu ********************************************		
 		
 	
 	 Scanner scanner = new Scanner (System.in);
 	 int user_id;
+	 String username = "";
 	 boolean login_success = false;
 	 while(!login_success) {
 		 System.out.println("Welecome User!!!!");
 		 System.out.println("Enter Username: ");
-		 String username = scanner.nextLine();
+		 username = scanner.nextLine();
 		 System.out.println("Username is  "+ username);
 		 System.out.println("Enter Password: ");
 		 String password = scanner.nextLine();
 		 login_success = musicdao.userLogIn(username,password);
 		 user_id = musicdao.getUserByUsername(username);
 	}
-	 
+	 user_id = musicdao.getUserByUsername(username);
 	 
 	 
 	 
@@ -53,7 +62,9 @@ public class login {
 	int A1 = scanner.nextInt();
 //***************** option 1(Search) ********************************************	 
 	if (A1==1) {//search
-		
+	boolean escape_from_a1 = false;
+	while(!escape_from_a1)
+	{
 		
 		System.out.println("Enter the album you want to Search, if all albums, enter nothing.");
 		String albumSearch = scanner.nextLine();
@@ -80,31 +91,35 @@ public class login {
 		if (A_1==1) {
 			System.out.println("Enter the album_id");
 			int selectedAlbum = scanner.nextInt();
-			musicdao.addAlbumTracker(musicdao.getAlbumById(selectedAlbum),trackerId);
+			musicdao.addAlbumTracker(musicdao.getAlbumByID(selectedAlbum), musicdao.getTrackerID(user_id).getId());
 		}
 		else if (A_1==2) {
 			System.out.println("Enter the album_id");
 			int selectedAlbum = scanner.nextInt();
-			musicdao.getAlbumById(selectedAlbum);
+			System.out.println(musicdao.getAlbumByID(selectedAlbum));
 		}
 		else if (A_1==3) {
-			continue;
+			escape_from_a1 = true;
 		} 
 			 
-		 
+	}
 	}
 	
 	 
 	//***************2(Tack view)********************************************	 
-	 
+	
+	
 	else  if(A1==2) {
+	boolean escape = false;
+	while(!escape)
+	{
 	 List<Album_Trackers> album_tracker_list = musicdao.getAllAlbumTrackersbyTracker(musicdao.getTrackerID(user_id).getId());
 	 String completed;
 	 
 	 System.out.println("These are all the Trackers you have: \n");
 	 for(Album_Trackers i : album_tracker_list)
 	 {
-		 double completion_percent = i.getCompleted_tracks() / getAlbumById(i.getAlbum_id()).getTrack_count();
+		 double completion_percent = i.getCompleted_tracks() / musicdao.getAlbumByID(i.getAlbum_id()).getTrack_count();
 		 if(completion_percent == 0)
 		 {
 			 completed = "Not Started";
@@ -117,7 +132,7 @@ public class login {
 		 {
 			 completed = "Completed";
 		 }
-		 System.out.println(i.getAlbum_id() + " " + musicdao.getAlbumById(i.getAlbum_id()).getAlbum_name() + " "
+		 System.out.println(i.getAlbum_id() + " " + musicdao.getAlbumByID(i.getAlbum_id()).getAlbum_name() + " "
 				 + i.getCompleted_tracks() + " " + completed);
 	 }
 	 System.out.println("Would you like to: \n");
@@ -125,54 +140,73 @@ public class login {
 	 System.out.println("2. Add Tracker");
 	 System.out.println("3. View Tracker");	
 	 System.out.println("4. Delete a Tracker");
+	 System.out.println("5. Back");
 	 int B_1 = scanner.nextInt();
 	 
 	 if (B_1==1) {
-		 System.out.println("What album do you want to update? Select an album number.");
+		 System.out.println("What album tracker do you want to update? Select an album number.");
 		 
 		 int album_id = scanner.nextInt();
-		 System.out.println("How many tracks have you completed on the album?");
-		 int completed_tracks = scanner.nextInt();
-		 musicdao.updateAlbumTracker(musicdao.getTrackerID(user_id).getId(),  album_id, completed_tracks);
+		 boolean appropriate_track = false;
+		 while(!appropriate_track)
+		 {
+			 try{
+				 System.out.println("How many tracks have you completed on the album?");
+				 int completed_tracks = scanner.nextInt();
+				 musicdao.updateAlbumTracker(musicdao.getTrackerID(user_id).getId(),  album_id, completed_tracks);
+			 } catch (NegativeTrackCountException e)
+			 {
+				 System.out.println(e.getMessage());
+				 continue;
+				 
+			 } catch (TrackCountExceededException e)
+			 {
+				 System.out.println(e.getMessage());
+				 continue;
+			 }
+			 appropriate_track = true;
+		 }
 	 }
 	 else if (B_1==2) {
-		 System.out.println("Add a Tracker");
-		
-		 
-	musicdaogetAlbumTracker(int trackerId, int albumId);
-		 
-		
+		 System.out.println("Select album number to track.");
+		 int selectedAlbum = scanner.nextInt();
+		 musicdao.addAlbumTracker(musicdao.getAlbumByID(selectedAlbum), musicdao.getTrackerID(user_id).getId());
 	 }
 	 
 	 
 	else if (B_1==3)	{
-		
-		musicdao.getAlbumTracker(int trackerId, int albumId);
+		System.out.println("Select album number to track.");
+		int selectedAlbum = scanner.nextInt();
+		System.out.println(musicdao.getAlbumTracker(musicdao.getTrackerID(user_id).getId(), selectedAlbum));
 	} 
 
 	else if (B_1==4)	//delete
-		{
-		musicdao.getAlbumTracker(int trackerId, int albumId);
-		System.out.println("Enter TrackerID and AlmbumID you want to delete from your Tracker:");
+	{
+		System.out.println("Enter AlmbumID you want to delete from your Tracker:");
+		int selectedAlbum = scanner.nextInt();
+		musicdao.deleteAlbumTracker(musicdao.getTrackerID(user_id).getId(), selectedAlbum);
 		
-		musicdao.deleteAlbumTracker(int trackerId, int albumId)
-		} 
-	 option_2.close();
-	 }
+	}
+	else if (B_1==5)
+	{
+		escape = true;
+	}
+	}
+	}
 	//***************Exit********************************************	 
-	 
-	 
+	  
 	else  if(A1==3) {
 		exit = true;
 	} 
 	}
 	
-	
-	
 	try {
 		musicdao.closeConnection();
 	} catch (SQLException e) {
 		System.out.println("Could not close connection properly");
+	} finally
+	{
+		scanner.close();
 	}
 }
 
