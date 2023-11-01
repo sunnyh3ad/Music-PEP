@@ -12,6 +12,13 @@ public class Album_Trackers {
 				+ completed_tracks + "]";
 	}
 
+	public Album_Trackers(int album_id, int tracker_id, int completed_tracks) {
+		super();
+		this.album_id = album_id;
+		this.tracker_id = tracker_id;
+		this.completed_tracks = completed_tracks;
+	}
+
 	public int getAlbum_id() {
 		return album_id;
 	}
