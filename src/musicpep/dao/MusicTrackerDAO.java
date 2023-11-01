@@ -17,24 +17,26 @@ public interface MusicTrackerDAO {
     // as well, this method will help with closing the connection
     public void closeConnection() throws SQLException;
 
+    // Find user by username
+    public int getUserByUsername(String username);
+
     // User login
     public boolean userLogIn(String username, String password);
-    
+
     public List<Album> getAllAlbum();
-    
+
     public List<Album> searchForAlbum(String albumSearch);
-    
+
     public Album_Trackers addAlbumTracker(Album selectedAlbum, int trackerId);
-    
+
     public Album_Trackers getAlbumTracker(int trackerId, int albumId);
-    
+
     public Album_Trackers updateAlbumTracker(int trackerId, int albumId, int completedTracks);
-    
+
     public boolean deleteAlbumTracker(int trackerId, int albumId);
-    
+
     public Trackers getTrackerID(int userId);
-    
+
     public Trackers addTrackers(int userId);
-    
-    
+
 }
