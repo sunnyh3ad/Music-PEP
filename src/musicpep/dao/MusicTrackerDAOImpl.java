@@ -11,7 +11,14 @@ import musicpep.connection.ConnectionManager;
 
 public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 
-    private Connection connection = null;
+    private static Connection connection = null;
+
+     public static Connection getConnection() throws ClassNotFoundException, SQLException {
+        if (connection == null) {
+            connection = ConnectionManager.getConnection();
+        }
+        return connection;
+    }
 
     @Override
     public void establishConnection() throws ClassNotFoundException, SQLException {
@@ -32,7 +39,7 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
         boolean credential_check = false;
 
         try {
-            // Ensure the connection is established
+
             if (connection == null) {
                 establishConnection();
             }
