@@ -178,6 +178,29 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
         return null;
     }
 
+    public List<Album_Trackers> getAllAlbumTrackersbyTracker(int trackerId) {
+        List<Album_Trackers> albumTrackerList = new ArrayList<>();
+
+        try (PreparedStatement prepStat = connection
+                .prepareStatement("SELECT * FROM albums_trackers WHERE tracker_id = ?")) {
+            prepStat.setInt(1, trackerId);
+            ResultSet resSet = prepStat.executeQuery();
+
+            while (resSet.next()) {
+                int albumId = resSet.getInt("album_id");
+                int completedTracks = resSet.getInt("completed_tracks");
+                Album_Trackers albumTracker = new Album_Trackers(albumId, trackerId, completedTracks);
+                albumTrackerList.add(albumTracker);
+            }
+            return albumTrackerList;
+        } catch (SQLException e) {
+            System.out.println(
+                    "An SQL exception has occurred for the musictracker database while fetching album trackers by tracker ID, the following exception message was given.");
+            System.out.println(e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
     public List<Album> getAllAlbum() {
         List<Album> albumList = new ArrayList<>();
 
