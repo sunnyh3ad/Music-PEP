@@ -31,6 +31,8 @@ public interface MusicTrackerDAO {
 
     public Album_Trackers getAlbumTracker(int trackerId, int albumId);
 
+    public Album_Trackers getAllAlbumTrackersbyTracker(int trackerId);
+
     public Album_Trackers updateAlbumTracker(int trackerId, int albumId, int completedTracks);
 
     public boolean deleteAlbumTracker(int trackerId, int albumId);
