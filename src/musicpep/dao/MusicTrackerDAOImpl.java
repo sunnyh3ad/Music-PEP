@@ -365,12 +365,6 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
     	return null;
 	}
 
-	@Override
-	public Trackers addTrackers(int userId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 	
 	
