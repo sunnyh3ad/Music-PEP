@@ -39,6 +39,4 @@ public interface MusicTrackerDAO {
 
     public Trackers getTrackerID(int userId);
 
-    public Trackers addTrackers(int userId);
-
 }
