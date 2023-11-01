@@ -1,6 +1,8 @@
 package musicpep.dao;
 
 import java.sql.SQLException;
+import java.util.List;
+import musicpep.data.*;
 
 /*
 	DAO INTERFACE
@@ -17,4 +19,22 @@ public interface MusicTrackerDAO {
 
     // User login
     public boolean userLogIn(String username, String password);
+    
+    public List<Album> getAllAlbum();
+    
+    public List<Album> searchForAlbum(String albumSearch);
+    
+    public Album_Trackers addAlbumTracker(Album selectedAlbum, int trackerId);
+    
+    public Album_Trackers getAlbumTracker(int trackerId, int albumId);
+    
+    public Album_Trackers updateAlbumTracker(int trackerId, int albumId, int completedTracks);
+    
+    public boolean deleteAlbumTracker(int trackerId, int albumId);
+    
+    public Trackers getTrackerID(int userId);
+    
+    public Trackers addTrackers(int userId);
+    
+    
 }
