@@ -229,6 +229,7 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
     	return false;
     }
 
+<<<<<<< HEAD
 	@Override
 	public Trackers getTrackerID(int userId) {
 		// TODO Auto-generated method stub
@@ -242,3 +243,6 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 	}
 
 }
+=======
+}
+>>>>>>> 5370b8fe1c05c800c211198f88c05dd82e0ea3ae
