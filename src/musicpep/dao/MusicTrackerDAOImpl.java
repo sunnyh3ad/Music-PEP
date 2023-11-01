@@ -1,6 +1,8 @@
 package musicpep.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,14 +32,21 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
         boolean credential_check = false;
 
         try {
-            Connection conn = ConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
+            // Ensure the connection is established
+            if (connection == null) {
+                establishConnection();
+            }
 
-            ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE username='" + username + "';");
+            try (PreparedStatement pstmt = connection.prepareStatement("SELECT password FROM users WHERE username=?")) {
 
-            if (rs.next()) {
-                if (rs.getString(3).equals(password)) {
-                    credential_check = true;
+                pstmt.setString(1, username);
+                ResultSet rs = pstmt.executeQuery();
+
+                if (rs.next()) {
+                    String storedPassword = rs.getString(1);
+                    if (storedPassword.equals(password)) {
+                        credential_check = true;
+                    }
                 }
             }
         } catch (SQLException | ClassNotFoundException e) {
@@ -45,5 +54,4 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
         }
         return credential_check;
     }
-
 }
