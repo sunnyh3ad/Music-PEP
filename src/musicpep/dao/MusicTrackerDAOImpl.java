@@ -297,4 +297,46 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
     	return null;
     }
 
+	
+	public Album getAlbumByID(int albumID) {
+		// TODO Auto-generated method stub
+		
+		try( PreparedStatement pstmt = connection.prepareStatement("select * from album where album_id = ?")) {
+    		pstmt.setInt(1, albumID);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			// rs.next() will return false if nothing found
+			if( rs.next() ) {
+				
+					
+                String album_name = rs.getString("album_name");
+                String artist = rs.getString("artist");
+                String genre = rs.getString("genre");
+                int trackCount = rs.getInt("track_count");
+                Album album = new Album(albumID, album_name, artist, genre, trackCount);
+	
+				rs.close();
+				
+				return album;
+				
+			}
+    	} catch(SQLException e) {
+    		System.out.println("An SQL exception has occured for the musictracker database while retrieving album by ID, the following exception message was given.");
+			System.out.println(e.getMessage());
+			return null;
+    	}
+    	
+    	return null;
+	}
+
+	@Override
+	public Trackers addTrackers(int userId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	
+	
 }
