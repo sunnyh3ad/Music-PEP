@@ -73,7 +73,7 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 	public Album_Trackers addAlbumTracker(Album selectedAlbum, int trackerId) {
 
 		
-		try( PreparedStatement pstmt = connection.prepareStatement("INSERT into Albums_Trackers(album_id, trackers_id, completed_tracks) values(?, ?, ?)") ) {
+		try( PreparedStatement pstmt = connection.prepareStatement("INSERT into albums_trackers(album_id, trackers_id, completed_tracks) values(?, ?, ?)") ) {
 			
 			pstmt.setInt(1, selectedAlbum.getId());
 			pstmt.setInt(2, trackerId);
@@ -100,7 +100,7 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 	@Override
 	public Album_Trackers getAlbumTracker(int trackerId, int albumId) {
 		
-		try( PreparedStatement pstmt = connection.prepareStatement("select * from Albums_Trackers where tracker_id = ? and album_id = ?") ) {
+		try( PreparedStatement pstmt = connection.prepareStatement("select * from albums_trackers where tracker_id = ? and album_id = ?") ) {
 			
 			pstmt.setInt(1, trackerId);
 			pstmt.setInt(2, albumId);
@@ -135,7 +135,7 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 	@Override
 	public Album_Trackers updateAlbumTracker(int trackerId, int albumId, int completedTracks) {
 		
-		try( PreparedStatement pstmt = connection.prepareStatement("update Albums_Trackers set album_id = ?, completed_tracks = ? where tracker_id = ?") ) {
+		try( PreparedStatement pstmt = connection.prepareStatement("update albums_trackers set album_id = ?, completed_tracks = ? where tracker_id = ?") ) {
 			
 			pstmt.setInt(1, albumId);
 			pstmt.setInt(2, completedTracks);
@@ -227,6 +227,32 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 		}
     	
     	return false;
+    }
+    
+    public Trackers getTrackerID(int userId) {
+    	
+    	try( PreparedStatement pstmt = connection.prepareStatement("select * from trackers where user_id = ?")) {
+    		pstmt.setInt(1, userId);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			// rs.next() will return false if nothing found
+			if( rs.next() ) {
+				
+				int trackerId =rs.getInt("tracker_id");
+				Trackers tracker = new Trackers(trackerId, userId);
+				rs.close();
+				
+				return tracker;
+				
+			}
+    	} catch(SQLException e) {
+    		System.out.println("An SQL exception has occured for the musictracker database while getting trackerId, the following exception message was given.");
+			System.out.println(e.getMessage());
+			return null;
+    	}
+    	
+    	return null;
     }
 
 }
