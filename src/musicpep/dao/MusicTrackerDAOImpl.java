@@ -5,16 +5,23 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
+import musicpep.data.*;
 import musicpep.connection.ConnectionManager;
-import musicpep.data.Album;
-import musicpep.data.Album_Trackers;
-import musicpep.data.Trackers;
+
 
 public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 
-    private Connection connection = null;
+    private static Connection connection = null;
+
+     public static Connection getConnection() throws ClassNotFoundException, SQLException {
+        if (connection == null) {
+            connection = ConnectionManager.getConnection();
+        }
+        return connection;
+    }
 
     @Override
     public void establishConnection() throws ClassNotFoundException, SQLException {
@@ -35,14 +42,21 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
         boolean credential_check = false;
 
         try {
-            Connection conn = ConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
 
-            ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE username='" + username + "';");
+            if (connection == null) {
+                establishConnection();
+            }
 
-            if (rs.next()) {
-                if (rs.getString(3).equals(password)) {
-                    credential_check = true;
+            try (PreparedStatement pstmt = connection.prepareStatement("SELECT password FROM users WHERE username=?")) {
+
+                pstmt.setString(1, username);
+                ResultSet rs = pstmt.executeQuery();
+
+                if (rs.next()) {
+                    String storedPassword = rs.getString(1);
+                    if (storedPassword.equals(password)) {
+                        credential_check = true;
+                    }
                 }
             }
         } catch (SQLException | ClassNotFoundException e) {
@@ -51,22 +65,13 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
         return credential_check;
     }
 
-	@Override
-	public List<Album> getAllAlbum() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
-	@Override
-	public List<Album> searchForAlbum(String albumSearch) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	@Override
 	public Album_Trackers addAlbumTracker(Album selectedAlbum, int trackerId) {
-		// TODO Auto-generated method stub
-		
+
 		
 		try( PreparedStatement pstmt = connection.prepareStatement("INSERT into Albums_Trackers(album_id, trackers_id, completed_tracks) values(?, ?, ?)") ) {
 			
@@ -94,7 +99,6 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 
 	@Override
 	public Album_Trackers getAlbumTracker(int trackerId, int albumId) {
-		// TODO Auto-generated method stub
 		
 		try( PreparedStatement pstmt = connection.prepareStatement("select * from Albums_Trackers where tracker_id = ? and album_id = ?") ) {
 			
@@ -130,7 +134,6 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 
 	@Override
 	public Album_Trackers updateAlbumTracker(int trackerId, int albumId, int completedTracks) {
-		// TODO Auto-generated method stub
 		
 		try( PreparedStatement pstmt = connection.prepareStatement("update Albums_Trackers set album_id = ?, completed_tracks = ? where tracker_id = ?") ) {
 			
@@ -153,11 +156,78 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 		return null;
 	}
 
-	@Override
-	public boolean deleteAlbumTracker(int trackerId, int albumId) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    
+    public List<Album> getAllAlbum() {
+    	List<Album> albumList = new ArrayList<>();
+    	
+    	try(Statement statement = connection.createStatement();
+    			ResultSet resSet = statement.executeQuery("select * from albums"))
+    	{
+    		while(resSet.next())
+			{
+				int id = resSet.getInt("album_id");
+				String album_name = resSet.getString("album_name");
+				String artist = resSet.getString("artist");
+				String genre = resSet.getString("genre");
+				int track_count = resSet.getInt("track_count");
+				Album album = new Album(id, album_name, artist, genre, track_count);
+				albumList.add(album);
+			}
+    	} catch(SQLException e)
+    	{
+    		System.out.println("An SQL exception has occured for the musictracker database while retreiving all albums, the following exception message was given.");
+			System.out.println(e.getMessage());
+			albumList = new ArrayList<>();
+    	}
+    	
+    	return albumList;
+    }
+    
+    public List<Album> searchForAlbum(String albumSearch) {
+    	List<Album> albumList = new ArrayList<>();
+    	
+    	try(PreparedStatement prepStat = connection.prepareStatement("select * from albums where album_name = ?"))
+		{
+    		prepStat.setString(1, albumSearch);
+			ResultSet resSet = prepStat.executeQuery();
+			while(resSet.next())
+			{
+				int id = resSet.getInt("album_id");
+				String album_name = resSet.getString("album_name");
+				String artist = resSet.getString("artist");
+				String genre = resSet.getString("genre");
+				int track_count = resSet.getInt("track_count");
+				Album album = new Album(id, album_name, artist, genre, track_count);
+				albumList.add(album);
+			}
+			return albumList;
+		} catch(SQLException e) {
+			System.out.println("An SQL exception has occured for the musictracker database while searching for an album, the following exception message was given.");
+			System.out.println(e.getMessage());
+			return new ArrayList<>();
+		}
+    }
+    
+    public boolean deleteAlbumTracker(int trackerId, int albumId) {
+    	
+    	try( PreparedStatement pstmt = connection.prepareStatement("DELETE from album_trackers WHERE ((album_id = ?) AND (tracker_id = ?))") ) {
+			
+			pstmt.setInt(1, albumId);
+			pstmt.setInt(2, trackerId);
+			
+			int i = pstmt.executeUpdate();
+			
+			if(i > 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			System.out.println("An SQL exception has occured while deleting from the musictracker database the following exception message was given.");
+			System.out.println(e.getMessage());
+			return false;
+		}
+    	
+    	return false;
+    }
 
 	@Override
 	public Trackers getTrackerID(int userId) {
