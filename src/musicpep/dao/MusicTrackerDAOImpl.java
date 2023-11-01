@@ -81,7 +81,6 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
             System.out.println(
                     "An SQL exception has occurred for the musictracker database while searching for a user by username, the following exception message was given.");
             System.out.println(e.getMessage());
-
             // Must return an int value
             return -1;
         }
@@ -270,6 +269,32 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
         }
 
         return false;
+    }
+    
+    public Trackers getTrackerID(int userId) {
+    	
+    	try( PreparedStatement pstmt = connection.prepareStatement("select * from trackers where user_id = ?")) {
+    		pstmt.setInt(1, userId);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			// rs.next() will return false if nothing found
+			if( rs.next() ) {
+				
+				int trackerId =rs.getInt("tracker_id");
+				Trackers tracker = new Trackers(trackerId, userId);
+				rs.close();
+				
+				return tracker;
+				
+			}
+    	} catch(SQLException e) {
+    		System.out.println("An SQL exception has occured for the musictracker database while getting trackerId, the following exception message was given.");
+			System.out.println(e.getMessage());
+			return null;
+    	}
+    	
+    	return null;
     }
 
 }
