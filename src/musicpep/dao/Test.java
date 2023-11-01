@@ -1,5 +1,5 @@
 package musicpep.dao;
 
-public class Test {
+public class test {
 
 }

@@ -12,7 +12,7 @@ public class ConnectionManager {
 	// ?serverTimezone=EST5EDT <-- add to end of URL if trouble connecting and on Mac/Linux
 	private static final String URL = "jdbc:mysql://localhost:3306/musictracker";
 	private static final String USERNAME = "root";
-	private static final String PASSWORD = "root";
+	private static final String PASSWORD = "Root@123";
 	private static Connection connection = null;
 	
 
