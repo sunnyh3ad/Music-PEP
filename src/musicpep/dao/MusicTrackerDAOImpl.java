@@ -8,8 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import musicpep.data.*;
 import musicpep.connection.ConnectionManager;
-import musicpep.data.Album;
+
 
 public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 
@@ -56,6 +57,98 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
         }
         return credential_check;
     }
+
+	
+
+	
+
+	@Override
+	public Album_Trackers addAlbumTracker(Album selectedAlbum, int trackerId) {
+
+		
+		try( PreparedStatement pstmt = connection.prepareStatement("INSERT into Albums_Trackers(album_id, trackers_id, completed_tracks) values(?, ?, ?)") ) {
+			
+			pstmt.setInt(1, selectedAlbum.getId());
+			pstmt.setInt(2, trackerId);
+			pstmt.setInt(3, 0);
+			
+			int count = pstmt.executeUpdate();
+			
+			if(count > 0) {
+				Album_Trackers album=new Album_Trackers(selectedAlbum.getId(),trackerId,0);
+				return album;
+			}
+			
+			
+		} catch (SQLException e) {
+			
+				System.out.println("A SQL exception has occured for the musictracker database while adding album to tracker, the following exception was given.");
+				System.out.println(e.getMessage());
+		}
+			
+		return null;
+	
+	}
+
+	@Override
+	public Album_Trackers getAlbumTracker(int trackerId, int albumId) {
+		
+		try( PreparedStatement pstmt = connection.prepareStatement("select * from Albums_Trackers where tracker_id = ? and album_id = ?") ) {
+			
+			pstmt.setInt(1, trackerId);
+			pstmt.setInt(2, albumId);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			// rs.next() will return false if nothing found
+			if( rs.next() ) {
+				
+				int tracksCompleted =rs.getInt("completed_tracks");
+				
+				rs.close();
+				
+				// constructing the object
+				Album_Trackers album=new Album_Trackers(albumId,trackerId,tracksCompleted);
+				
+				return album;
+				
+			}
+			else {
+				rs.close();
+			}
+		
+		} catch(SQLException e) {
+			System.out.println("A SQL exception has occured for the musictracker database while retrieving album tracker, the following exception was given.");
+			System.out.println(e.getMessage());
+		}
+		
+		return null;
+	}
+
+	@Override
+	public Album_Trackers updateAlbumTracker(int trackerId, int albumId, int completedTracks) {
+		
+		try( PreparedStatement pstmt = connection.prepareStatement("update Albums_Trackers set album_id = ?, completed_tracks = ? where tracker_id = ?") ) {
+			
+			pstmt.setInt(1, albumId);
+			pstmt.setInt(2, completedTracks);
+			pstmt.setInt(3, trackerId);
+			
+			int count = pstmt.executeUpdate();
+			
+			if(count > 0) {
+				Album_Trackers album=new Album_Trackers(albumId,trackerId,completedTracks);
+				return album;
+			}
+			
+		} catch(SQLException e) {
+			System.out.println("A SQL exception has occured for the musictracker database while updating album tracker, the following exception was given.");
+			System.out.println(e.getMessage());
+		}
+		
+		return null;
+	}
+
     
     public List<Album> getAllAlbum() {
     	List<Album> albumList = new ArrayList<>();
@@ -128,4 +221,5 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
     	
     	return false;
     }
+
 }
