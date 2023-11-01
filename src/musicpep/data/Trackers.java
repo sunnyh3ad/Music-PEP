@@ -5,6 +5,12 @@ public class Trackers {
 	private int id;
 	private int user_id;
 
+	public Trackers(int id, int user_id) {
+		super();
+		this.id = id;
+		this.user_id = user_id;
+	}
+
 	public int getId() {
 		return id;
 	}
