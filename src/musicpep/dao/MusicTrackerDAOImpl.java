@@ -10,6 +10,8 @@ import java.util.List;
 
 import musicpep.data.*;
 import musicpep.connection.ConnectionManager;
+import musicpep.dao.TrackCountExceededException;
+import musicpep.dao.NegativeTrackCountException;
 
 public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 
@@ -152,29 +154,61 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
     }
 
     @Override
-    public Album_Trackers updateAlbumTracker(int trackerId, int albumId, int completedTracks) {
+    public Album_Trackers updateAlbumTracker(int trackerId, int albumId, int completedTracks)
+            throws TrackCountExceededException, NegativeTrackCountException {
 
-        try (PreparedStatement pstmt = connection.prepareStatement(
-                "update Albums_Trackers set album_id = ?, completed_tracks = ? where tracker_id = ?")) {
+        if (completedTracks < 0) {
+            throw new NegativeTrackCountException("Completed tracks cannot be negative.");
+        }
 
-            pstmt.setInt(1, albumId);
-            pstmt.setInt(2, completedTracks);
-            pstmt.setInt(3, trackerId);
+        try {
+            // Check the track count of the album
+            int albumTrackCount = getAlbumTrackCount(albumId);
+            if (completedTracks > albumTrackCount) {
+                throw new TrackCountExceededException("Completed tracks cannot exceed the album's track count.");
+            }
 
-            int count = pstmt.executeUpdate();
+            try (PreparedStatement pstmt = connection.prepareStatement(
+                    "update Albums_Trackers set album_id = ?, completed_tracks = ? where tracker_id = ?")) {
 
-            if (count > 0) {
-                Album_Trackers album = new Album_Trackers(albumId, trackerId, completedTracks);
-                return album;
+                pstmt.setInt(1, albumId);
+                pstmt.setInt(2, completedTracks);
+                pstmt.setInt(3, trackerId);
+
+                int count = pstmt.executeUpdate();
+
+                if (count > 0) {
+                    Album_Trackers album = new Album_Trackers(albumId, trackerId, completedTracks);
+                    return album;
+                }
+
+            } catch (SQLException e) {
+                System.out.println(
+                        "A SQL exception has occurred for the musictracker database while updating album tracker, the following exception was given.");
+                System.out.println(e.getMessage());
             }
 
         } catch (SQLException e) {
             System.out.println(
-                    "A SQL exception has occured for the musictracker database while updating album tracker, the following exception was given.");
+                    "A SQL exception has occurred for the musictracker database while checking album track count, the following exception was given.");
             System.out.println(e.getMessage());
         }
 
         return null;
+    }
+
+    // Used in UpdateAlbumTracker method above
+    private int getAlbumTrackCount(int albumId) throws SQLException {
+        try (PreparedStatement pstmt = connection
+                .prepareStatement("SELECT track_count FROM albums WHERE album_id = ?")) {
+            pstmt.setInt(1, albumId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("track_count");
+            } else {
+                throw new SQLException("Album not found with ID: " + albumId);
+            }
+        }
     }
 
     public List<Album_Trackers> getAllAlbumTrackersbyTracker(int trackerId) {
@@ -270,31 +304,32 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 
         return false;
     }
-    
+
     public Trackers getTrackerID(int userId) {
-    	
-    	try( PreparedStatement pstmt = connection.prepareStatement("select * from trackers where user_id = ?")) {
-    		pstmt.setInt(1, userId);
-			
-			ResultSet rs = pstmt.executeQuery();
-			
-			// rs.next() will return false if nothing found
-			if( rs.next() ) {
-				
-				int trackerId =rs.getInt("tracker_id");
-				Trackers tracker = new Trackers(trackerId, userId);
-				rs.close();
-				
-				return tracker;
-				
-			}
-    	} catch(SQLException e) {
-    		System.out.println("An SQL exception has occured for the musictracker database while getting trackerId, the following exception message was given.");
-			System.out.println(e.getMessage());
-			return null;
-    	}
-    	
-    	return null;
+
+        try (PreparedStatement pstmt = connection.prepareStatement("select * from trackers where user_id = ?")) {
+            pstmt.setInt(1, userId);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            // rs.next() will return false if nothing found
+            if (rs.next()) {
+
+                int trackerId = rs.getInt("tracker_id");
+                Trackers tracker = new Trackers(trackerId, userId);
+                rs.close();
+
+                return tracker;
+
+            }
+        } catch (SQLException e) {
+            System.out.println(
+                    "An SQL exception has occured for the musictracker database while getting trackerId, the following exception message was given.");
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return null;
     }
 
 }
