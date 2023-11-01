@@ -98,24 +98,42 @@ public class login {
 	//***************2(Tack view)********************************************	 
 	 
 	else  if(A1==2) {
-	 List<Album_Trackers> album_tracker_list = musicdao.getAllAlbumTrackersByTracker(musicdao.getTrackerID(user_id));
-		 
+	 List<Album_Trackers> album_tracker_list = musicdao.getAllAlbumTrackersbyTracker(musicdao.getTrackerID(user_id).getId());
+	 String completed;
+	 
 	 System.out.println("These are all the Trackers you have: \n");
-	 System.out.println(album_tracker_list);
+	 for(Album_Trackers i : album_tracker_list)
+	 {
+		 double completion_percent = i.getCompleted_tracks() / getAlbumById(i.getAlbum_id()).getTrack_count();
+		 if(completion_percent == 0)
+		 {
+			 completed = "Not Started";
+		 }
+		 else if((completion_percent > 0) && (completion_percent < 1))
+		 {
+			 completed = "In Progress";
+		 }
+		 else
+		 {
+			 completed = "Completed";
+		 }
+		 System.out.println(i.getAlbum_id() + " " + musicdao.getAlbumById(i.getAlbum_id()).getAlbum_name() + " "
+				 + i.getCompleted_tracks() + " " + completed);
+	 }
 	 System.out.println("Would you like to: \n");
 	 System.out.println("1. Update tracker");
 	 System.out.println("2. Add Tracker");
 	 System.out.println("3. View Tracker");	
 	 System.out.println("4. Delete a Tracker");
-	 int B_1= scanner.nextInt();
+	 int B_1 = scanner.nextInt();
 	 
 	 if (B_1==1) {
-		 System.out.println("What album do you want to update?");
+		 System.out.println("What album do you want to update? Select an album number.");
 		 
-		 
-		 musicdao.getAlbumTracker(int trackerId, int albumId);
-		 musicdao.updateAlbumTracker(trackerId,  albumId, completedTracks);
-		 
+		 int album_id = scanner.nextInt();
+		 System.out.println("How many tracks have you completed on the album?");
+		 int completed_tracks = scanner.nextInt();
+		 musicdao.updateAlbumTracker(musicdao.getTrackerID(user_id).getId(),  album_id, completed_tracks);
 	 }
 	 else if (B_1==2) {
 		 System.out.println("Add a Tracker");
