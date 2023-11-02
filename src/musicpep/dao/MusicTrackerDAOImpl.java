@@ -169,11 +169,11 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
             }
 
             try (PreparedStatement pstmt = connection.prepareStatement(
-                    "update Albums_Trackers set album_id = ?, completed_tracks = ? where tracker_id = ?")) {
+                    "update Albums_Trackers set completed_tracks = ? where (tracker_id = ?) AND (album_id = ?);")) {
 
-                pstmt.setInt(1, albumId);
-                pstmt.setInt(2, completedTracks);
-                pstmt.setInt(3, trackerId);
+                pstmt.setInt(3, albumId);
+                pstmt.setInt(1, completedTracks);
+                pstmt.setInt(2, trackerId);
 
                 int count = pstmt.executeUpdate();
 

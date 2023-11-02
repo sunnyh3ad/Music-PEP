@@ -12,7 +12,8 @@ public class ConnectionManager {
 	// ?serverTimezone=EST5EDT <-- add to end of URL if trouble connecting and on Mac/Linux
 	private static final String URL = "jdbc:mysql://localhost:3306/musictracker";
 	private static final String USERNAME = "root";
-	private static final String PASSWORD = "root123";
+	private static final String PASSWORD = "root";
+
 	private static Connection connection = null;
 	
 
@@ -31,29 +32,6 @@ public class ConnectionManager {
 		}
 
 		return connection;
-	}
-
-	public static void main(String[] args) {
-
-		Connection conn = null;
-		
-		try {
-			conn = ConnectionManager.getConnection();
-			System.out.println("Connected");
-			
-		} catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
-
-		try {
-			conn.close();
-			System.out.println("Closed connection");
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
 }
