@@ -68,7 +68,7 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 
     // Find user by username
     public int getUserByUsername(String username) {
-        try (PreparedStatement prepStat = connection.prepareStatement("SELECT * FROM users WHERE user_name = ?")) {
+        try (PreparedStatement prepStat = connection.prepareStatement("SELECT * FROM users WHERE username = ?")) {
             prepStat.setString(1, username);
             ResultSet resSet = prepStat.executeQuery();
 
@@ -93,7 +93,7 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
     public Album_Trackers addAlbumTracker(Album selectedAlbum, int trackerId) {
 
         try (PreparedStatement pstmt = connection.prepareStatement(
-                "INSERT into Albums_Trackers(album_id, trackers_id, completed_tracks) values(?, ?, ?)")) {
+                "INSERT into Albums_Trackers(album_id, tracker_id, completed_tracks) values(?, ?, ?)")) {
 
             pstmt.setInt(1, selectedAlbum.getId());
             pstmt.setInt(2, trackerId);
@@ -169,11 +169,11 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
             }
 
             try (PreparedStatement pstmt = connection.prepareStatement(
-                    "update Albums_Trackers set album_id = ?, completed_tracks = ? where tracker_id = ?")) {
+                    "update Albums_Trackers set completed_tracks = ? where (tracker_id = ?) AND (album_id = ?);")) {
 
-                pstmt.setInt(1, albumId);
-                pstmt.setInt(2, completedTracks);
-                pstmt.setInt(3, trackerId);
+                pstmt.setInt(3, albumId);
+                pstmt.setInt(1, completedTracks);
+                pstmt.setInt(2, trackerId);
 
                 int count = pstmt.executeUpdate();
 
@@ -285,7 +285,7 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
     public boolean deleteAlbumTracker(int trackerId, int albumId) {
 
         try (PreparedStatement pstmt = connection
-                .prepareStatement("DELETE from album_trackers WHERE ((album_id = ?) AND (tracker_id = ?))")) {
+                .prepareStatement("DELETE from albums_trackers WHERE ((album_id = ?) AND (tracker_id = ?))")) {
 
             pstmt.setInt(1, albumId);
             pstmt.setInt(2, trackerId);
@@ -336,7 +336,7 @@ public class MusicTrackerDAOImpl implements MusicTrackerDAO {
 	public Album getAlbumByID(int albumID) {
 		// TODO Auto-generated method stub
 		
-		try( PreparedStatement pstmt = connection.prepareStatement("select * from album where album_id = ?")) {
+		try( PreparedStatement pstmt = connection.prepareStatement("select * from albums where album_id = ?")) {
     		pstmt.setInt(1, albumID);
 			
 			ResultSet rs = pstmt.executeQuery();

@@ -58,8 +58,8 @@ public class Album {
 
 	@Override
 	public String toString() {
-		return "Album [id=" + id + ", album_name=" + album_name + ", artist=" + artist + ", genre=" + genre
-				+ ", track_count=" + track_count + "]";
+		return "" + id + ", " + album_name + ", " + artist + ", " + genre
+				+ ", " + track_count;
 	}
 
 }
