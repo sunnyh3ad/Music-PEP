@@ -13,7 +13,7 @@ import musicpep.data.User;
 
 public class login {
 	
-	public void log_in() {
+	public static void log_in() {
 	
 		
 	//*****************ConnectionMenu ********************************************
@@ -60,6 +60,7 @@ public class login {
 	System.out.println("3. Exit"); 
 	 
 	int A1 = scanner.nextInt();
+	scanner.nextLine ();
 //***************** option 1(Search) ********************************************	 
 	if (A1==1) {//search
 	boolean escape_from_a1 = false;
@@ -87,15 +88,18 @@ public class login {
 
 		System.out.println("3.Back");
 		int A_1 = scanner.nextInt();
+		scanner.nextLine ();
 		
 		if (A_1==1) {
 			System.out.println("Enter the album_id");
 			int selectedAlbum = scanner.nextInt();
+			scanner.nextLine ();
 			musicdao.addAlbumTracker(musicdao.getAlbumByID(selectedAlbum), musicdao.getTrackerID(user_id).getId());
 		}
 		else if (A_1==2) {
 			System.out.println("Enter the album_id");
 			int selectedAlbum = scanner.nextInt();
+			scanner.nextLine ();
 			System.out.println(musicdao.getAlbumByID(selectedAlbum));
 		}
 		else if (A_1==3) {
@@ -142,17 +146,20 @@ public class login {
 	 System.out.println("4. Delete a Tracker");
 	 System.out.println("5. Back");
 	 int B_1 = scanner.nextInt();
+	 scanner.nextLine ();
 	 
 	 if (B_1==1) {
 		 System.out.println("What album tracker do you want to update? Select an album number.");
 		 
 		 int album_id = scanner.nextInt();
+		 scanner.nextLine ();
 		 boolean appropriate_track = false;
 		 while(!appropriate_track)
 		 {
 			 try{
 				 System.out.println("How many tracks have you completed on the album?");
 				 int completed_tracks = scanner.nextInt();
+				 scanner.nextLine ();
 				 musicdao.updateAlbumTracker(musicdao.getTrackerID(user_id).getId(),  album_id, completed_tracks);
 			 } catch (NegativeTrackCountException e)
 			 {
@@ -170,6 +177,7 @@ public class login {
 	 else if (B_1==2) {
 		 System.out.println("Select album number to track.");
 		 int selectedAlbum = scanner.nextInt();
+		 scanner.nextLine ();
 		 musicdao.addAlbumTracker(musicdao.getAlbumByID(selectedAlbum), musicdao.getTrackerID(user_id).getId());
 	 }
 	 
@@ -177,6 +185,7 @@ public class login {
 	else if (B_1==3)	{
 		System.out.println("Select album number to track.");
 		int selectedAlbum = scanner.nextInt();
+		scanner.nextLine ();
 		System.out.println(musicdao.getAlbumTracker(musicdao.getTrackerID(user_id).getId(), selectedAlbum));
 	} 
 
@@ -184,6 +193,7 @@ public class login {
 	{
 		System.out.println("Enter AlmbumID you want to delete from your Tracker:");
 		int selectedAlbum = scanner.nextInt();
+		scanner.nextLine ();
 		musicdao.deleteAlbumTracker(musicdao.getTrackerID(user_id).getId(), selectedAlbum);
 		
 	}
