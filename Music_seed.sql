@@ -32,7 +32,7 @@ VALUES ('Night at the Opera', 'Queen', 'Rock', 10),
 INSERT INTO albums_trackers (album_id, tracker_id, completed_tracks)
 VALUES (1, 1, 5),
     -- 5 tracks completed out of 10
-    (2, 1, 7),
+    (2, 1, 5),
     -- 7 tracks completed out of 12
     (3, 2, 3);
 -- 3 tracks completed out of 8
