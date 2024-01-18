@@ -13,7 +13,7 @@ To run this project, you will need to have the following installed on your syste
 
 1. Clone the repository to your local machine.
 2. Open the project in your preferred IDE.
-3. Configure the database connection settings in the `ConnectionManager.java` file.
+3. Configure the database connection settings in the `ConnectionManager.java` file which can be found in the folder connection with the path `src/musicpep/connection`. 
 4. Run the project.
 
 ## Features
